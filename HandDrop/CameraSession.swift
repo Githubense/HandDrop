@@ -14,15 +14,14 @@ struct CameraSession: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: ARViewController, context: Context) {}
 }
 
-// AR View Controller with Hand Action Classifier
 class ARViewController: UIViewController, ARSessionDelegate {
     var arView: ARSCNView!
-    var handActionModel: HandDrop! // Replace with your CoreML model
+    var handActionModel: HandDrop!
     var frameCounter = 0
-    var queue = [MLMultiArray]() // Queue for storing hand poses
+    var queue = [MLMultiArray]()
     var queueSamplingCounter = 0
-    let queueSize = 15 // Size of the queue
-    let queueSamplingCount = 5 // Sampling interval
+    let queueSize = 15
+    let queueSamplingCount = 5
     let handPosePredictionInterval = 2
     let handActionConfidenceThreshold: Double = 0.8
 
@@ -40,14 +39,12 @@ class ARViewController: UIViewController, ARSessionDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Setup AR view
         arView = ARSCNView(frame: view.bounds)
         arView.session.delegate = self
         view.addSubview(arView)
 
         configureARSession()
 
-        // Load Hand Action Model
         do {
             handActionModel = try HandDrop(configuration: MLModelConfiguration())
         } catch {
@@ -69,8 +66,7 @@ class ARViewController: UIViewController, ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         let pixelBuffer = frame.capturedImage
         let handPoseRequest = VNDetectHumanHandPoseRequest()
-        handPoseRequest.maximumHandCount = 2 // Adjust for multi-hand detection
-
+        handPoseRequest.maximumHandCount = 1
         let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
         do {
             try handler.perform([handPoseRequest])
@@ -81,30 +77,22 @@ class ARViewController: UIViewController, ARSessionDelegate {
 
         guard let handPoses = handPoseRequest.results, !handPoses.isEmpty else { return }
 
-        // Increment frame counter
         frameCounter += 1
 
-        // Skip frames for processing
         if frameCounter % handPosePredictionInterval == 0 {
             for handObservation in handPoses {
                 guard let keypointsMultiArray = try? handObservation.keypointsMultiArray() else { continue }
 
                 if handObservation.chirality == .right {
-                    // Update the FIFO queue
                     queue.append(keypointsMultiArray)
                     queue = Array(queue.suffix(queueSize))
                     queueSamplingCounter += 1
 
-                    // Perform prediction when the queue is ready
                     if queue.count == queueSize && queueSamplingCounter % queueSamplingCount == 0 {
                         do {
                             let poses = MLMultiArray(concatenating: queue, axis: 0, dataType: .float32)
                             let prediction = try handActionModel.prediction(poses: poses)
-
-                            // Directly access the label (no optional binding needed)
                             let label = prediction.label
-                            
-                            // Safely unwrap the confidence value from labelProbabilities
                             if let confidence = prediction.labelProbabilities[label],
                                confidence > handActionConfidenceThreshold {
                                 DispatchQueue.main.async {
@@ -121,15 +109,12 @@ class ARViewController: UIViewController, ARSessionDelegate {
     }
 
     func renderHandPoseEffect(name: String) {
-        // Visual effect based on the hand action
         print("Detected Hand Action: \(name)")
     }
 }
 
-// SwiftUI Wrapper View
 struct CameraSessionView: View {
     @State private var isUsingFrontCamera = true
-
     var body: some View {
         ZStack {
             CameraSession(isUsingFrontCamera: $isUsingFrontCamera)
