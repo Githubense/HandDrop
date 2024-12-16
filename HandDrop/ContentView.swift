@@ -6,16 +6,21 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct ContentView: View {
+    @State private var text: String = ""
+
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            TextField("Text", text: $text)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
+            
+            Button("Copy") {
+                UIPasteboard.general.string = text
+            }
         }
-        .padding()
     }
 }
 
