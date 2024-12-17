@@ -29,7 +29,6 @@ class ARViewController: UIViewController, ARSessionDelegate {
     @Binding var isUsingFrontCamera: Bool
     @Binding var text: String
 
-
     init(isUsingFrontCamera: Binding<Bool>, text: Binding<String>) {
         self._isUsingFrontCamera = isUsingFrontCamera
         self._text = text
@@ -104,6 +103,9 @@ class ARViewController: UIViewController, ARSessionDelegate {
                                     
                                     if prediction.label == "pinch" {
                                         UIPasteboard.general.string = self.text
+                                        UIAccessibility.post(notification: .announcement, argument: "Text copied to clipboard")
+                                    } else {
+                                        UIAccessibility.post(notification: .announcement, argument: "Detected gesture: \(label)")
                                     }
                                 }
                             }
@@ -130,6 +132,8 @@ struct CameraSessionView: View {
             CameraSession(isUsingFrontCamera: $isUsingFrontCamera, text: $text).ignoresSafeArea()
             Color.white.ignoresSafeArea()
             TextField("Text", text: $text)
+                .accessibilityLabel("Text Input Field")
+                .accessibilityHint("Enter the text to be copied to the clipboard.")
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
         }
