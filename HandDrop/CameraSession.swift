@@ -6,9 +6,10 @@ import CoreML
 // SwiftUI View for Camera Feed
 struct CameraSession: UIViewControllerRepresentable {
     @Binding var isUsingFrontCamera: Bool
+    @Binding var text: String
 
     func makeUIViewController(context: Context) -> ARViewController {
-        ARViewController(isUsingFrontCamera: $isUsingFrontCamera)
+        ARViewController(isUsingFrontCamera: $isUsingFrontCamera, text: $text)
     }
 
     func updateUIViewController(_ uiViewController: ARViewController, context: Context) {}
@@ -23,12 +24,15 @@ class ARViewController: UIViewController, ARSessionDelegate {
     let queueSize = 15
     let queueSamplingCount = 5
     let handPosePredictionInterval = 2
-    let handActionConfidenceThreshold: Double = 0.8
+    let handActionConfidenceThreshold: Double = 0.75
 
     @Binding var isUsingFrontCamera: Bool
+    @Binding var text: String
 
-    init(isUsingFrontCamera: Binding<Bool>) {
+
+    init(isUsingFrontCamera: Binding<Bool>, text: Binding<String>) {
         self._isUsingFrontCamera = isUsingFrontCamera
+        self._text = text
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -97,6 +101,10 @@ class ARViewController: UIViewController, ARSessionDelegate {
                                confidence > handActionConfidenceThreshold {
                                 DispatchQueue.main.async {
                                     self.renderHandPoseEffect(name: label)
+                                    
+                                    if prediction.label == "pinch" {
+                                        UIPasteboard.general.string = self.text
+                                    }
                                 }
                             }
                         } catch {
@@ -115,9 +123,15 @@ class ARViewController: UIViewController, ARSessionDelegate {
 
 struct CameraSessionView: View {
     @State private var isUsingFrontCamera = true
+    @State private var text: String = ""
+
     var body: some View {
         ZStack {
-            CameraSession(isUsingFrontCamera: $isUsingFrontCamera)
+            CameraSession(isUsingFrontCamera: $isUsingFrontCamera, text: $text).ignoresSafeArea()
+            Color.white.ignoresSafeArea()
+            TextField("Text", text: $text)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
         }
     }
 }
