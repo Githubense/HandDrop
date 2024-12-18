@@ -39,7 +39,7 @@ Welcome to **HandDrop**, an innovative app that combines the power of **hand ges
 ### Installation
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/HandDrop.git
+   git clone https://github.com/Githubense/HandDrop.git
    ```
 2. Open the project in Xcode:
    ```bash
