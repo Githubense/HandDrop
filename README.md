@@ -99,6 +99,3 @@ HandDrop is inspired by the WWDC session ["Build an Action Classifier with Creat
 ---
 
 Elevate your content sharing experience with **HandDrop** — the future of gesture-based collaboration!
-```
-
-This README highlights the integration of **AirDrop** and **Handoff** while maintaining clarity about the app's functionality. Let me know if further adjustments are needed! 🚀
