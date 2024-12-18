@@ -11,7 +11,7 @@ import SwiftUI
 struct HandDropApp: App {
     var body: some Scene {
         WindowGroup {
-            CameraSessionView()
+            ContentView()
         }
     }
 }
