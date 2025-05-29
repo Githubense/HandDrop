@@ -1,6 +1,6 @@
 # HandDrop: Gesture-Powered Content Sharing App
 
-Welcome to **HandDrop**, an innovative app that combines the power of **hand gestures** with Apple's **AirDrop** and **Handoff** technologies. Seamlessly share content between devices using real-time hand action recognition powered by ARKit and CoreML.
+Welcome to **HandDrop**, an innovative app that combines the power of **hand gestures** with Apple's **Handoff** technologies. (WIP for *Airdrop**) Seamlessly share content between devices using real-time hand action recognition powered by ARKit and CoreML.
 
 ---
 
